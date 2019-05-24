@@ -73,7 +73,7 @@ abstract class AbstractElement
      *
      * @return \PhpOffice\Common\XMLWriter
      */
-    protected function getXmlWriter()
+    public function getXmlWriter()
     {
         return $this->xmlWriter;
     }

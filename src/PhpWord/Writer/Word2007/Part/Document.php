@@ -18,8 +18,31 @@
 namespace PhpOffice\PhpWord\Writer\Word2007\Part;
 
 use PhpOffice\Common\XMLWriter;
+use PhpOffice\PhpWord\Element\Object;
+use PhpOffice\PhpWord\Element\Title;
 use PhpOffice\PhpWord\Element\Section;
+use PhpOffice\PhpWord\Element\Text;
+use PhpOffice\PhpWord\Element\TOC;
+use PhpOffice\PhpWord\Element\Table;
+use PhpOffice\PhpWord\Element\Image;
+use PhpOffice\PhpWord\Element\ListItem;
 use PhpOffice\PhpWord\Writer\Word2007\Element\Container;
+use PhpOffice\PhpWord\Element\Link;
+use PhpOffice\PhpWord\Element\PageBreak;
+use PhpOffice\PhpWord\Element\TextBreak;
+use PhpOffice\PhpWord\Element\TextRun;
+use PhpOffice\PhpWord\Writer\Word2007\Element\Title as TitleWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\Table as TableWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\Object as ObjectWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\Text as TextWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\TextRun as TextRunWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\Image as ImageWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\Link as LinkWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\ListItem as ListItemWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\ListItemRun as ListItemRunWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\TOC as TOCWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\TextBreak as TextBreakWriter;
+use PhpOffice\PhpWord\Writer\Word2007\Element\PageBreak as PageBreakWriter;
 use PhpOffice\PhpWord\Writer\Word2007\Style\Section as SectionStyleWriter;
 
 /**
@@ -134,5 +157,62 @@ class Document extends AbstractPart
         $styleWriter->write();
 
         $xmlWriter->endElement(); // w:sectPr
+    }
+
+    public function getObjectAsText($element)
+    {
+        if ($this->getParentWriter()->getUseDiskCaching()) {
+            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        } else {
+            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+        }
+        if ($element instanceof Section) {
+
+        } elseif ($element instanceof Text) {
+            $textwriter = new TextWriter($objWriter, $element);
+            $textwriter->write();
+            $objWriter = $textwriter->getXmlWriter();
+        } elseif ($element instanceof TextRun) {
+            $textrunwriter = new TextRunWriter($objWriter, $element);
+            $textrunwriter->write();
+            $objWriter = $textrunwriter->getXmlWriter();
+        } elseif ($element instanceof Link) {
+            $linkwriter = new LinkWriter($objWriter, $element);
+            $linkwriter->write();
+            $objWriter = $linkwriter->getXmlWriter();
+        } elseif ($element instanceof Title) {
+            $titlewriter = new TitleWriter($objWriter, $element);
+            $titlewriter->write();
+            $objWriter = $titlewriter->getXmlWriter();
+        } elseif ($element instanceof TextBreak) {
+            $textbreakwriter = new TextBreakWriter($objWriter, $element);
+            $textbreakwriter->write();
+            $objWriter = $textbreakwriter->getXmlWriter();
+        } elseif ($element instanceof PageBreak) {
+            $pagebreakwriter = new PageBreakWriter($objWriter, $element);
+            $pagebreakwriter->write();
+            $objWriter = $pagebreakwriter->getXmlWriter();
+        } elseif ($element instanceof Table) {
+            $tablewriter = new TableWriter($objWriter, $element);
+            $tablewriter->write();
+            $objWriter = $tablewriter->getXmlWriter();
+        } elseif ($element instanceof ListItem) {
+            $listitemwriter = new ListItemWriter($objWriter, $element);
+            $listitemwriter->write();
+            $objWriter = $listitemwriter->getXmlWriter();
+        } elseif ($element instanceof Image) {
+            $imagewriter = new ImageWriter($objWriter, $element);
+            $imagewriter->write();
+            $objWriter = $imagewriter->getXmlWriter();
+        } elseif ($element instanceof Object) {
+            $objectwriter = new ObjectWriter($objWriter, $element);
+            $objectwriter->write();
+            $objWriter = $objectwriter->getXmlWriter();
+        } elseif ($element instanceof TOC) {
+            $tocwriter = new TOCWriter($objWriter, $element);
+            $tocwriter->write();
+            $objWriter = $tocwriter->getXmlWriter();
+        }
+        return trim($objWriter->getData());
     }
 }
